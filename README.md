@@ -45,5 +45,7 @@ Roadmap
 * select albumns/tracks/artists and download in zip format (up to XXMB)
 * integrate mp3 play such that albumns can be played in web browser
 
+### Contributions: are welcome, use github.
 
+### License: MIT
 

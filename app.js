@@ -1,12 +1,18 @@
 var express = require('express')
 var AWS = require('aws-sdk')
+var fs = require('fs')
+
+// local modules
+var config = require('./aws-config.json')
+
+console.log(config)
 
 AWS.config.loadFromPath('./aws-config.json')
 
 var s3 = new AWS.S3();
 
-params = {
-  Bucket:'becsws'
+var s3_params = {
+  Bucket:config.bucket
 }
 
 var s3_dir_value = false
@@ -29,17 +35,19 @@ function process_s3_data(data) {
   }
 
   data.Contents.forEach(function(item) {
+    console.log(item.Key);
+    var r;
     if (r = /(.*)\/(.*)\/(.*)\/(.*\.mp3$)/.exec(item.Key)) {
       var file = r[4];
       var s = {
         genre:r[1],
         artist:r[2],
         album:r[3],
-        files:[]
+        files:[{key:item.Key, name:file}]
       }
       var key = s.genre + '/' + s.artist + '/' + s.album;
       if (albums.hasOwnProperty(key)) {
-        albums[key].files.push(file);
+        albums[key].files.push({key:item.Key, name:file});
       } else {
         albums[key] = s;
       }
@@ -47,7 +55,7 @@ function process_s3_data(data) {
   })
 }
 
-s3.listObjects(params, function(err, data) {
+s3.listObjects(s3_params, function(err, data) {
   if (err) {
     console.log(err);
   } else {
@@ -66,6 +74,20 @@ app.configure(function() {
 
 app.get('/albums', function(req, res) {
   res.send(albums);
+})
+
+app.get(/file\/(.+)/, function(req, res) {
+  var key = req.params[0];
+  var r;
+  if (r = /.*\/(.*\.mp3)$/.exec(key)) {
+    var file_name = r[1];
+    var params = s3_params;
+    params.Key = key;
+    res.setHeader('Content-type', 'audio/mpeg3');
+    s3.getObject(params).createReadStream().pipe(res);
+  } else {
+    res.send('key error')
+  }
 })
 
 port = 8025

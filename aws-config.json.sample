@@ -2,6 +2,7 @@
 "accessKeyId": "my key", 
 "secretAccessKey": "my secret", 
 "region": "us-east-1",
-"bucket": "becsws"
+"bucket": "becsws",
+"port": "8025"
 }
 

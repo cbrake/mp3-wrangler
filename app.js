@@ -90,7 +90,6 @@ app.get(/file\/(.+)/, function(req, res) {
   }
 })
 
-port = 8025
-app.listen(port)
-console.log("started on port " + port)
+app.listen(config.port)
+console.log("started on port " + config.port)
 

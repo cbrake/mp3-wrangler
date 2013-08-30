@@ -24,7 +24,7 @@ This application uses the following components:
 
 * nodejs
 * expressjs
-* bootstrap
+* bootstrap 3.0
 * react 
 
 Key files include:
@@ -33,7 +33,7 @@ Key files include:
 * public/index.html (main html file)
 * public/js/app.js (react client side application)
 
-The rest is just bits of various components that are used.
+The rest is just bits of above components.
 
 Roadmap
 -------
@@ -43,6 +43,7 @@ Roadmap
 * display based on tag data instead of file structure
 * search features to search for tracks based on ID3 tags
 * select albumns/tracks/artists and download in zip format (up to XXMB)
+* integrate mp3 play such that albumns can be played in web browser
 
 
 

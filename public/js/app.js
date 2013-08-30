@@ -1,19 +1,25 @@
 /** @jsx React.DOM */
 
+var FileLine = React.createClass({
+  render: function() {
+    var uri = "/file/" + this.props.key;
+    return (
+      <li><a href={uri}>{this.props.name}</a></li>
+    );
+  }
+});
+
 var Files = React.createClass({
   render: function() {
-      var hide = this.props.visible ? "" : "hide";
-      return (
-        <ul>
-          <li>file1.mp3</li>
-          <li>file2.mp3</li>
-          <li>file3.mp3</li>
-          <li>file4.mp3</li>
-          <li>file5.mp3</li>
-          <li>file6.mp3</li>
-          <li>file7.mp3</li>
-        </ul>
-      );
+    var files = this.props.files.map(function(file) {
+      return <FileLine key={file.key} name={file.name} />
+    });
+
+    return (
+      <ul>
+        {files}
+      </ul>
+    );
   }
 });
 
@@ -26,7 +32,7 @@ var AlbumLine = React.createClass({
     return false;
   },
   render: function() {
-    var files = this.state.displayFiles ? <Files /> : null;
+    var files = this.state.displayFiles ? <Files files={this.props.album.files} /> : null;
     return (
       <tr key={this.props.key}>
         <td>{this.props.album.genre}</td>

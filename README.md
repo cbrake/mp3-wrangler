@@ -22,10 +22,15 @@ Operation
 
 This application uses the following components:
 
-* nodejs
-* expressjs
-* bootstrap 3.0
-* react 
+* server
+    * nodejs
+    * expressjs
+    * nedb
+    * aws-sdk
+    * musicmetadata
+* client
+    * bootstrap 3.0
+    * react 
 
 Key files include:
 

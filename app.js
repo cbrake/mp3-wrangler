@@ -1,11 +1,10 @@
 var express = require('express')
 var AWS = require('aws-sdk')
 var fs = require('fs')
+var Datastore = require('nedb')
 
 // local modules
 var config = require('./aws-config.json')
-
-console.log(config)
 
 AWS.config.loadFromPath('./aws-config.json')
 
@@ -15,7 +14,7 @@ var s3_params = {
   Bucket:config.bucket
 }
 
-var s3_dir_value = false
+var db = new Datastore({ filename: './aws-wrangler.db', autoload: true});
 
 // album - (Object)
 //   genre - (String)
@@ -31,11 +30,10 @@ var artist_index = {}
 
 function process_s3_data(data) {
   if (data.IsTruncated === true) {
-    console.log("WARNING: S3 data is tructated");
+    console.log("WARNING: S3 data is truncated");
   }
 
   data.Contents.forEach(function(item) {
-    console.log(item.Key);
     var r;
     if (r = /(.*)\/(.*)\/(.*)\/(.*\.mp3$)/.exec(item.Key)) {
       var file = r[4];
@@ -59,9 +57,15 @@ s3.listObjects(s3_params, function(err, data) {
   if (err) {
     console.log(err);
   } else {
-    //console.log(data);
     process_s3_data(data);
     console.log(albums);
+    db.insert(albums, function(err, newDoc) {
+      if (err) {
+        console.log("Error updating database: " + err);
+      } else {
+        console.log("DB updated");
+      }
+    })
   }
 });
 

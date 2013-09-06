@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-var FileLine = React.createClass({
+var TrackLine = React.createClass({
   render: function() {
     var uri = "/file/" + this.props.key;
     return (
@@ -9,15 +9,20 @@ var FileLine = React.createClass({
   }
 });
 
-var Files = React.createClass({
+var Tracks = React.createClass({
   render: function() {
-    var files = this.props.files.map(function(file) {
-      return <FileLine key={file.key} name={file.name} />
+    console.log(this.props)
+    var tracks_ = this.props.tracks;
+    tracks_.sort()
+    var tracks = tracks_.map(function(t) {
+      var r = /.*\/(.*\.mp3)/.exec(t);
+      var name = r[1];
+      return <TrackLine key={t} name={name} />
     });
 
     return (
       <ul>
-        {files}
+        {tracks}
       </ul>
     );
   }
@@ -25,21 +30,21 @@ var Files = React.createClass({
 
 var AlbumLine = React.createClass({
   getInitialState: function() {
-    return {displayFiles: false};
+    return {displayTracks: false};
   },
   handleAlbumClick: function(event) {
-    this.setState({displayFiles: !this.state.displayFiles});
+    this.setState({displayTracks: !this.state.displayTracks});
     return false;
   },
   render: function() {
-    var files = this.state.displayFiles ? <Files files={this.props.album.files} /> : null;
+    var tracks = this.state.displayTracks ? <Tracks tracks={this.props.album.tracks} /> : null;
     return (
       <tr key={this.props.key}>
         <td>{this.props.album.genre}</td>
         <td>{this.props.album.artist}</td>
         <td>
           <p><a href="" onClick={this.handleAlbumClick}>{this.props.album.album}</a></p>
-          <p>{files}</p>
+          <p>{tracks}</p>
         </td>
       </tr>
     ); 
@@ -56,18 +61,24 @@ var AlbumList = React.createClass({
         this.setState({albums: data});
       }.bind(this)
     });
-    return {albums: {}};
+    return {albums: []};
   },
 
   render: function() {
     var album_lines = [];
 
-    var i = 0;
-    for (album in this.state.albums) {
-      var a = this.state.albums[album]
-      album_lines.push(<AlbumLine key={i} album={a} />);
-      i++
-    }
+    this.state.albums.forEach(function(a) {
+      var r;
+      if (r = /(.*)\/(.*)\/(.*)/.exec(a.key)) {
+        var a_ = {
+          genre: r[1],
+          artist: r[2],
+          album: r[3],
+          tracks: a.tracks
+        }
+        album_lines.push(<AlbumLine key={a.key} album={a_} />);
+      }
+    })
 
     return (
       <div>

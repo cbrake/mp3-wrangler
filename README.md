@@ -30,7 +30,7 @@ This application uses the following components:
     * musicmetadata
 * client
     * bootstrap 3.0
-    * react 
+    * react 0.4.1
 
 Key files include:
 

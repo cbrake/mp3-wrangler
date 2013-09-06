@@ -77,32 +77,12 @@ function process_s3_data(data) {
               console.log('finished processing ' + item.Key);
             })
           } else {
-            console.log('found ' + item.Key + ' in db');
           }
         }
       })
     }
   })
 }
-
-/*
-    var r;
-    if (r = /(.*)\/(.*)\/(.*)\/(.*\.mp3$)/.exec(item.Key)) {
-      var file = r[4];
-      var s = {
-        genre:r[1],
-        artist:r[2],
-        album:r[3],
-        files:[{key:item.Key, name:file}]
-      }
-      var key = s.genre + '/' + s.artist + '/' + s.album;
-      if (albums.hasOwnProperty(key)) {
-        albums[key].files.push({key:item.Key, name:file});
-      } else {
-        albums[key] = s;
-      }
-    }
-    */
 
 function create_albums() {
   db_tracks.find({}, function(err, docs) {
@@ -114,12 +94,10 @@ function create_albums() {
       })
 
       var album_key = doc.id3.genre + '/' + doc.id3.artist + '/' + doc.id3.album;
-      console.log('album_key = ' + album_key);
       db_albums.update({key:album_key}, {$addToSet: {tracks: doc.key}}, {upsert: true}, function(err, n, upsert) {
         if (err) {
           console.log('Error updating db_albums: ' + err);
         } else {
-          console.log('n = ' + n + ' upsert = ' + upsert);
         }
       })
     })
@@ -132,20 +110,6 @@ s3.listObjects(s3_params, function(err, data) {
   } else {
     process_s3_data(data);
     create_albums();
-    db_albums.find({}, function(err, docs) {
-      console.log(docs);
-    })
-
-/*
-    console.log(albums);
-    db.insert(albums, function(err, newDoc) {
-      if (err) {
-        console.log('Error updating database: ' + err);
-      } else {
-        console.log('DB updated');
-      }
-    })
-    */
   }
 });
 
@@ -157,7 +121,14 @@ app.configure(function() {
 })
 
 app.get('/albums', function(req, res) {
-  res.send(albums);
+  db_albums.find({}, function(err, docs) {
+    if (err) {
+      console.log('/albums error: ' + err);
+      res.send(err);
+    } else {
+      res.send(docs);
+    }
+  });
 })
 
 app.get(/file\/(.+)/, function(req, res) {

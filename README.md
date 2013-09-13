@@ -48,12 +48,12 @@ is updated which contains album information.
 Roadmap
 -------
 
-* create index of S3 key and ID3 tag data
+* ~~create index of S3 key and ID3 tag data~~
 * periodically rescan and look for new keys, if new keys found, extract ID3 tag data
-* display based on tag data instead of file structure
+* ~~display based on tag data instead of file structure~~
 * search features to search for tracks based on ID3 tags
 * select albumns/tracks/artists and download in zip format (up to XXMB)
-* integrate mp3 play such that albumns can be played in web browser
+* integrate mp3 player such that albumns can be played in web browser
 
 ### Contributions: are welcome, use github.
 

@@ -36,7 +36,7 @@ Key files include:
 
 * app.js (main nodejs app)
 * public/index.html (main html file)
-* public/js/app.js (react client side application)
+* public/js/main.js (react client side application)
 
 The rest is just bits of above components.
 

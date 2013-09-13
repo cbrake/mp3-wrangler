@@ -1,23 +1,87 @@
 /** @jsx React.DOM */
 
-var TrackLine = React.createClass({
+var PopOver = React.createClass({
+  componentDidMount: function() {
+    $(this.getDOMNode())
+      .popover({html: true, content: this.props.children})
+  },
+  componentWillUnmount: function() {
+    $(this.getDOMNode()).off('hidden', this.handleHidden);
+  },
+  handleClick: function() {
+    $(this.getDOMNode())
+      .popover('show')
+  },
+  render: function() {
+    return this.transferPropsTo(
+      <div>
+        <a href="#" onClick={this.handleClick}>{this.props.linkText}</a>
+        <div className="data-content">
+          This is a test
+        </div>
+      </div>
+    );
+  }
+});
+
+var Id3Tags = React.createClass({
+  render: function() {
+    var tag_lines = [];
+
+    for (tag in this.props.tags) {
+      tag_lines.push(<li key={tag}>{tag}: {this.props.tags[tag]}</li>);
+    }
+
+    return (
+      <ul>
+        {tag_lines}
+      </ul>
+    )
+  }
+})
+
+var Track = React.createClass({
+  getInitialState: function() {
+    $.ajax({
+      url: 'id3/' + this.props.key,
+      dataType: 'json',
+      mimeType: 'textPlain',
+      success: function(data) {
+        this.setState({id3Tags: data});
+      }.bind(this),
+      error: function(err) {
+        console.log('/id3 error: ' + err);
+      }.bind(this)
+    });
+    return {displayTags: false, id3Tags:{}};
+  },
+  handleClick: function() {
+    this.setState({displayTags: !this.state.displayTags});
+  },
   render: function() {
     var uri = "/file/" + this.props.key;
+    var tags = this.state.displayTags ? <Id3Tags tags={this.state.id3Tags} /> : null;
     return (
-      <li><a href={uri}>{this.props.name}</a></li>
+      <div>
+        <a href={uri}>{this.props.name}</a>
+        --
+        <a href="#" onClick={this.handleClick}>(tags)</a>
+        <div>
+          {tags}
+        </div>
+      </div>
     );
   }
 });
 
 var Tracks = React.createClass({
   render: function() {
-    console.log(this.props)
     var tracks_ = this.props.tracks;
     tracks_.sort()
     var tracks = tracks_.map(function(t) {
       var r = /.*\/(.*\.mp3)/.exec(t);
       var name = r[1];
-      return <TrackLine key={t} name={name} />
+      return <li key={t}><Track key={t} name={name} /></li>
     });
 
     return (
@@ -59,6 +123,9 @@ var AlbumList = React.createClass({
       mimeType: 'textPlain',
       success: function(data) {
         this.setState({albums: data});
+      }.bind(this),
+      error: function(err) {
+        console.log('/albums error: ' + err);
       }.bind(this)
     });
     return {albums: []};

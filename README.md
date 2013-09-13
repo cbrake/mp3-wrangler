@@ -34,9 +34,9 @@ This application uses the following components:
 
 Key files include:
 
-* app.js (main nodejs app)
+* app.js (server side nodejs app)
 * public/index.html (main html file)
-* public/js/main.js (react client side application)
+* public/js/main.js (client side application)
 
 The rest is just bits of above components.
 

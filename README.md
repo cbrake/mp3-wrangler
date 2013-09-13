@@ -5,11 +5,12 @@ Web application that can be used to browse and download mp3 files from Amazon S3
 
 ![screenshot](https://raw.github.com/cbrake/mp3-wrangler/master/screenshot.png)
 
-Features:
+Features
+--------
 
-* builds a database of tracks and albums of mp3 files in a S3 bucket
+* builds a database of tracks and albums from mp3 files in a S3 bucket
 * displays listing of albums
-* optionally display tracks and track ID3 tags
+* drill down display tracks and ID3 tags
 * download individual tracks
 
 Install

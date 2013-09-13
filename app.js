@@ -145,6 +145,13 @@ app.get(/file\/(.+)/, function(req, res) {
   }
 })
 
+app.get(/id3\/(.+)/, function(req, res) {
+ var key = req.params[0];
+ db_tracks.findOne({key:key}, function(err, doc) {
+   res.send(doc.id3);
+ });
+})
+
 app.listen(config.port)
 console.log('started on port ' + config.port)
 

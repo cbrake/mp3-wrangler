@@ -40,6 +40,11 @@ Key files include:
 
 The rest is just bits of above components.
 
+On startup, a listing of all files are fetched from the S3 bucket.  If the mp3 file is not
+located in tracks.db, the file is fetched and the ID3 tags are parsed and stored in
+tracks.db.  After the process of fetching any new track info is completed, the albumns.db
+is updated which contains album information.
+
 Roadmap
 -------
 

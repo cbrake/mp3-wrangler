@@ -1,5 +1,22 @@
 /** @jsx React.DOM */
 
+var albumsToDownload = [];
+
+var DownloadAlbums = React.createClass({
+  handleClick: function() {
+    console.log(albumsToDownload);
+    $.post('download', {albums: albumsToDownload}, function(data) {
+      console.log("Post returned");
+      console.log(data);
+    }.bind(this))
+  },
+  render: function() {
+    return (
+      <button type="button" class="btn btn-primary" onClick={this.handleClick}>Download Selected</button>
+    );
+  }
+});
+
 var PopOver = React.createClass({
   componentDidMount: function() {
     $(this.getDOMNode())
@@ -83,7 +100,6 @@ var Tracks = React.createClass({
       var name = r[1];
       return <li key={t}><Track key={t} name={name} /></li>
     });
-
     return (
       <ul>
         {tracks}
@@ -94,11 +110,22 @@ var Tracks = React.createClass({
 
 var AlbumLine = React.createClass({
   getInitialState: function() {
-    return {displayTracks: false};
+    return {displayTracks: false, selected: false};
   },
   handleAlbumClick: function(event) {
     this.setState({displayTracks: !this.state.displayTracks});
     return false;
+  },
+  handleSelectToggle: function(event) {
+    if (!this.state.selected) {
+      albumsToDownload.push(this.props.key);
+    } else {
+      var i = albumsToDownload.indexOf(this.props.key);
+      if (i > -1) {
+        albumsToDownload.splice(i, 1);
+      }
+    }
+    this.setState({selected: !this.state.selected});
   },
   render: function() {
     var tracks = this.state.displayTracks ? <Tracks tracks={this.props.album.tracks} /> : null;
@@ -109,6 +136,9 @@ var AlbumLine = React.createClass({
         <td>
           <p><a href="" onClick={this.handleAlbumClick}>{this.props.album.album}</a></p>
           <p>{tracks}</p>
+        </td>
+        <td>
+          <input type="checkbox" checked={this.state.selected ? 'checked' : ''} onChange={this.handleSelectToggle} />
         </td>
       </tr>
     ); 
@@ -149,12 +179,14 @@ var AlbumList = React.createClass({
 
     return (
       <div>
+      <DownloadAlbums />
       <table class="table table-striped">
         <thead>
           <tr>
             <th>Genre</th>
             <th>Artist</th>
             <th>Album</th>
+            <th>Select</th>
           </tr>
         </thead>
         <tbody>

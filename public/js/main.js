@@ -5,14 +5,17 @@ var albumsToDownload = [];
 var DownloadAlbums = React.createClass({
   handleClick: function() {
     console.log(albumsToDownload);
-    $.post('download', {albums: albumsToDownload}, function(data) {
+    $.post('/update_selected', {albums: albumsToDownload}, function(data) {
       console.log("Post returned");
       console.log(data);
     }.bind(this))
   },
   render: function() {
     return (
-      <button type="button" class="btn btn-primary" onClick={this.handleClick}>Download Selected</button>
+      <div>
+        <a href="/download" class="btn btn-primary">Download Selected</a>
+        <button type="button" class="btn btn-primary" onClick={this.handleClick}>Update Selected</button>
+      </div>
     );
   }
 });

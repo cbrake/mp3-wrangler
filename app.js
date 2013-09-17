@@ -61,6 +61,7 @@ var id3_queue = async.queue(function(s3_key, callback) {
 }, 1);
 
 function process_s3_data(data) {
+  console.log("Processing S3 data ...");
   if (data.IsTruncated === true) {
     console.log('WARNING: S3 data is truncated');
   }
@@ -85,6 +86,7 @@ function process_s3_data(data) {
 }
 
 function create_albums() {
+  console.log("Creating albums ...");
   db_tracks.find({}, function(err, docs) {
     docs.forEach(function(doc) {
       ['artist', 'genre'].forEach(function(field) {
@@ -104,12 +106,14 @@ function create_albums() {
   })
 }
 
+
+id3_queue.drain = create_albums;
+
 s3.listObjects(s3_params, function(err, data) {
   if (err) {
     console.log(err);
   } else {
     process_s3_data(data);
-    create_albums();
   }
 });
 

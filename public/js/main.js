@@ -2,7 +2,7 @@
 
 var DownloadAlbum = React.createClass({
   handleRemove: function() {
-    this.props.removeAlbum(this.props.key);
+    this.props.removeAlbumDownload(this.props.key);
     return false;
   },
   render: function() {
@@ -19,7 +19,7 @@ var DownloadAlbums = React.createClass({
     var that = this;
     var selected_albums = [];
     this.props.albumsToDownload.forEach(function(a) {
-      selected_albums.push(<li key={a}><DownloadAlbum removeAlbum={that.props.removeAlbum} key={a}/></li>);
+      selected_albums.push(<li key={a}><DownloadAlbum removeAlbumDownload={that.props.removeAlbumDownload} key={a}/></li>);
     });
     var heading = selected_albums.length > 0 ? <h3>Selected for download</h3> : null;
     var download = selected_albums.length > 0 ? 
@@ -180,7 +180,7 @@ var AlbumList = React.createClass({
     a.push(album);
     this.setState({albumsToDownload: a});
   },
-  removeAlbum: function(album) {
+  removeAlbumDownload: function(album) {
     var index = this.state.albumsToDownload.indexOf(album);
     if (index > -1) {
       var a = this.state.albumsToDownload;
@@ -205,14 +205,13 @@ var AlbumList = React.createClass({
         if (that.state.albumsToDownload.indexOf(a.key) > -1) {
           selected = true;
         }
-        //that.cliff('cliff's album');
         album_lines.push(<AlbumLine key={a.key} album={a_} addAlbumDownload={that.addAlbumDownload} selected={selected} />);
       }
     })
 
     return (
       <div>
-      <DownloadAlbums removeAlbum={this.removeAlbum} albumsToDownload={this.state.albumsToDownload} />
+      <DownloadAlbums removeAlbumDownload={this.removeAlbumDownload} albumsToDownload={this.state.albumsToDownload} />
       <table class="table table-striped">
         <thead>
           <tr>

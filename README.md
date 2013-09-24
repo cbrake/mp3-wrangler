@@ -4,6 +4,7 @@ MP3 Wrangler
 Web application that can be used to browse and download mp3 files from Amazon S3.
 
 ![screenshot](https://raw.github.com/cbrake/mp3-wrangler/master/screenshot.png)
+![screenshot-2](https://raw.github.com/cbrake/mp3-wrangler/master/screenshot-2.png)
 
 Features
 --------

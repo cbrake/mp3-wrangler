@@ -1,20 +1,38 @@
 /** @jsx React.DOM */
 
-var albumsToDownload = [];
-
-var DownloadAlbums = React.createClass({
-  handleClick: function() {
-    console.log(albumsToDownload);
-    $.post('/update_selected', {albums: albumsToDownload}, function(data) {
-      console.log("Post returned");
-      console.log(data);
-    }.bind(this))
+var DownloadAlbum = React.createClass({
+  handleRemove: function() {
+    this.props.removeAlbum(this.props.key);
+    return false;
   },
   render: function() {
     return (
       <div>
-        <a href="/download" class="btn btn-primary">Download Selected</a>
-        <button type="button" class="btn btn-primary" onClick={this.handleClick}>Update Selected</button>
+        {this.props.key} <a href="" onClick={this.handleRemove}> (remove)</a>
+      </div>
+    )
+  }
+});
+
+var DownloadAlbums = React.createClass({
+  render: function() {
+    var that = this;
+    var selected_albums = [];
+    this.props.albumsToDownload.forEach(function(a) {
+      selected_albums.push(<li key={a}><DownloadAlbum removeAlbum={that.props.removeAlbum} key={a}/></li>);
+    });
+    var heading = selected_albums.length > 0 ? <h3>Selected for download</h3> : null;
+    var download = selected_albums.length > 0 ? 
+      <a href="/download" class="btn btn-primary form-control">Download Selected</a> : null;
+    return (
+      <div>
+        {heading}
+        <ul>
+          {selected_albums}
+        </ul>
+        <div class="col-sm-2">
+          {download}
+        </div>
       </div>
     );
   }
@@ -113,25 +131,19 @@ var Tracks = React.createClass({
 
 var AlbumLine = React.createClass({
   getInitialState: function() {
-    return {displayTracks: false, selected: false};
+    return {displayTracks: false};
   },
   handleAlbumClick: function(event) {
     this.setState({displayTracks: !this.state.displayTracks});
     return false;
   },
-  handleSelectToggle: function(event) {
-    if (!this.state.selected) {
-      albumsToDownload.push(this.props.key);
-    } else {
-      var i = albumsToDownload.indexOf(this.props.key);
-      if (i > -1) {
-        albumsToDownload.splice(i, 1);
-      }
-    }
-    this.setState({selected: !this.state.selected});
+  handleAdd: function(event) {
+    this.props.addAlbumDownload(this.props.key);
+    return false;
   },
   render: function() {
     var tracks = this.state.displayTracks ? <Tracks tracks={this.props.album.tracks} /> : null;
+    var add = this.props.selected ? 'selected' : <button type="button" class="btn btn-default" onClick = {this.handleAdd}>add</button>;
     return (
       <tr key={this.props.key}>
         <td>{this.props.album.genre}</td>
@@ -141,7 +153,7 @@ var AlbumLine = React.createClass({
           <p>{tracks}</p>
         </td>
         <td>
-          <input type="checkbox" checked={this.state.selected ? 'checked' : ''} onChange={this.handleSelectToggle} />
+          {add}
         </td>
       </tr>
     ); 
@@ -161,10 +173,23 @@ var AlbumList = React.createClass({
         console.log('/albums error: ' + err);
       }.bind(this)
     });
-    return {albums: []};
+    return {albums: [], albumsToDownload: []};
   },
-
+  addAlbumDownload: function(album) {
+    var a = this.state.albumsToDownload;
+    a.push(album);
+    this.setState({albumsToDownload: a});
+  },
+  removeAlbum: function(album) {
+    var index = this.state.albumsToDownload.indexOf(album);
+    if (index > -1) {
+      var a = this.state.albumsToDownload;
+      a.splice(index, 1);
+      this.setState({albumsToDownload: a});
+    }
+  },
   render: function() {
+    var that = this;
     var album_lines = [];
 
     this.state.albums.forEach(function(a) {
@@ -176,20 +201,25 @@ var AlbumList = React.createClass({
           album: r[3],
           tracks: a.tracks
         }
-        album_lines.push(<AlbumLine key={a.key} album={a_} />);
+        var selected = false;
+        if (that.state.albumsToDownload.indexOf(a.key) > -1) {
+          selected = true;
+        }
+        //that.cliff('cliff's album');
+        album_lines.push(<AlbumLine key={a.key} album={a_} addAlbumDownload={that.addAlbumDownload} selected={selected} />);
       }
     })
 
     return (
       <div>
-      <DownloadAlbums />
+      <DownloadAlbums removeAlbum={this.removeAlbum} albumsToDownload={this.state.albumsToDownload} />
       <table class="table table-striped">
         <thead>
           <tr>
             <th>Genre</th>
             <th>Artist</th>
             <th>Album</th>
-            <th>Select</th>
+            <th>Add to Download</th>
           </tr>
         </thead>
         <tbody>

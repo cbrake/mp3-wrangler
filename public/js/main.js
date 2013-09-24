@@ -175,10 +175,17 @@ var AlbumList = React.createClass({
     });
     return {albums: [], albumsToDownload: []};
   },
+  updateAlbumsDownload: function() {
+    $.post('/update_selected', {albums: this.state.albumsToDownload}, function(data) {
+      console.log("Post returned");
+      console.log(data);
+    }.bind(this));
+  },
   addAlbumDownload: function(album) {
     var a = this.state.albumsToDownload;
     a.push(album);
     this.setState({albumsToDownload: a});
+    this.updateAlbumsDownload();
   },
   removeAlbumDownload: function(album) {
     var index = this.state.albumsToDownload.indexOf(album);
@@ -186,6 +193,7 @@ var AlbumList = React.createClass({
       var a = this.state.albumsToDownload;
       a.splice(index, 1);
       this.setState({albumsToDownload: a});
+      this.updateAlbumsDownload();
     }
   },
   render: function() {

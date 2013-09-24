@@ -1,0 +1,7 @@
+{
+  "mp3Source": {
+    "type": "file",
+    "location": "~/Music"
+  },
+  "port": "8025"
+}

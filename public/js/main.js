@@ -162,38 +162,36 @@ var AlbumLine = React.createClass({
 
 var AlbumList = React.createClass({
   getInitialState: function() {
-    $.ajax({
-      url: 'albums',
-      dataType: 'json',
-      mimeType: 'textPlain',
-      success: function(data) {
-        this.setState({albums: data});
-      }.bind(this),
-      error: function(err) {
-        console.log('/albums error: ' + err);
-      }.bind(this)
-    });
+    $.get('/albums', function(data) {
+      this.setState({albums: data});
+    }.bind(this));
+
+    $.get('/download-list', function(data) {
+      this.setState({albumsToDownload: data});
+    }.bind(this));
+
     return {albums: [], albumsToDownload: []};
   },
-  updateAlbumsDownload: function() {
-    $.post('/update_selected', {albums: this.state.albumsToDownload}, function(data) {
-      console.log("Post returned");
+  updateAlbumsDownload: function(albums) {
+    var that = this;
+    $.post('/download-list', {albums: albums}, function(data) {
       console.log(data);
+      $.get('/download-list', function(data) {
+        that.setState({albumsToDownload: data});
+      }.bind(that));
     }.bind(this));
   },
   addAlbumDownload: function(album) {
     var a = this.state.albumsToDownload;
     a.push(album);
-    this.setState({albumsToDownload: a});
-    this.updateAlbumsDownload();
+    this.updateAlbumsDownload(a);
   },
   removeAlbumDownload: function(album) {
     var index = this.state.albumsToDownload.indexOf(album);
     if (index > -1) {
       var a = this.state.albumsToDownload;
       a.splice(index, 1);
-      this.setState({albumsToDownload: a});
-      this.updateAlbumsDownload();
+      this.updateAlbumsDownload(a);
     }
   },
   render: function() {

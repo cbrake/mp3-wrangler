@@ -45,10 +45,16 @@ var WebUi = module.exports = function(db_albums, db_tracks, port, source) {
    });
   })
 
-  app.post('/update_selected', function(req, res) {
-    console.log(req.body.albums);
+  app.post('/download-list', function(req, res) {
     req.session.albums = req.body.albums;
     res.send('ok');
+  })
+
+  app.get('/download-list', function(req, res) {
+    if (!req.session.albums) {
+      req.session.albums = []
+    }
+    res.send(req.session.albums);
   })
 
   app.get('/download', function(req, res) {

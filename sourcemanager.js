@@ -2,6 +2,7 @@
 // takes a source, and does various batch operations
 // exports:
 //   - (void) update(callback)
+//     - callback: function(err) { ... }
 //   - (stream) createReadFileStream(String) -- String is aws key
 //   - (stream) createDownloadStream(Array<String>) -- creates zip file for array of albums
 
@@ -15,16 +16,35 @@ var SourceManager = module.exports = function(dbAlbums, dbTracks, source) {
   this.source = source;
 }
 
+// this function refreshes the albumn db from the tracks db
+// TODO implement callback
+function create_albums(callback) {
+  console.log("Creating albums ...");
+  dbTracks.find({}, function(err, docs) {
+    docs.forEach(function(doc) {
+      ['artist', 'genre'].forEach(function(field) {
+        if (doc.id3[field].length == 0) {
+          doc.id3[field].push('None');
+        }
+      })
 
-SourceManager.prototype.update = function (callback) {
+      var album_key = doc.id3.genre + '/' + doc.id3.artist + '/' + doc.id3.album;
+      dbAlbums.update({key:album_key}, {$addToSet: {tracks: doc.key}}, {upsert: true}, function(err, n, upsert) {
+        if (err) {
+          return console.log('Error updating dbAlbums: ' + err);
+        } else {
+        }
+      })
+    })
+  })
+}
 
-  if (callback) {
-    console.log('WARNING: SourceManager.prototype.update callback is not implemented yet');
-  }
+SourceManager.prototype.update = function(callback) {
 
   var dbAlbums = this.dbAlbums;
   var dbTracks = this.dbTracks;
   var source = this.source;
+
 
   // queue requests for ID3 data so we don't get 1000's of open requests
   // at one time
@@ -51,6 +71,8 @@ SourceManager.prototype.update = function (callback) {
   }, 1);
 
   function process_data(data) {
+    var fetch_i3d_data = false;
+
     console.log("Processing data ...");
     if (data.IsTruncated === true) {
       console.log('WARNING: data is truncated');
@@ -65,6 +87,7 @@ SourceManager.prototype.update = function (callback) {
           if (docs.length == 0) {
             console.log('Getting ID3 tags for ' + item);
             id3_queue.push(item, function(err) {
+              fetch_i3d_data = true;
               console.log('finished processing ' + item);
             })
           } else {
@@ -72,28 +95,13 @@ SourceManager.prototype.update = function (callback) {
         })
       }
     })
+
+    if (!fetch_i3d_data) {
+      // we are finished
+      callback(null);
+    }
   }
 
-  function create_albums() {
-    console.log("Creating albums ...");
-    dbTracks.find({}, function(err, docs) {
-      docs.forEach(function(doc) {
-        ['artist', 'genre'].forEach(function(field) {
-          if (doc.id3[field].length == 0) {
-            doc.id3[field].push('None');
-          }
-        })
-
-        var album_key = doc.id3.genre + '/' + doc.id3.artist + '/' + doc.id3.album;
-        dbAlbums.update({key:album_key}, {$addToSet: {tracks: doc.key}}, {upsert: true}, function(err, n, upsert) {
-          if (err) {
-            return console.log('Error updating dbAlbums: ' + err);
-          } else {
-          }
-        })
-      })
-    })
-  }
 
   id3_queue.drain = create_albums;
 

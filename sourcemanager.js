@@ -45,7 +45,6 @@ SourceManager.prototype.update = function(callback) {
   var dbTracks = this.dbTracks;
   var source = this.source;
 
-
   // queue requests for ID3 data so we don't get 1000's of open requests
   // at one time
   var id3_queue = async.queue(function(key, callback) {
@@ -66,7 +65,7 @@ SourceManager.prototype.update = function(callback) {
       }
       // TODO: stop stream to save bandwidth
       // could possibly stop stream after we have metadata as well
-      callback();
+      callback(null);
     });
   }, 1);
 
@@ -101,7 +100,6 @@ SourceManager.prototype.update = function(callback) {
       callback(null);
     }
   }
-
 
   id3_queue.drain = create_albums;
 

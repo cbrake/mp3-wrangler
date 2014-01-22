@@ -27,5 +27,9 @@ var source = new SourceS3(config.s3Config);
 var source_manager = new SourceManager(db_albums, db_tracks, source);
 var ui = new webui(db_albums, db_tracks, config.port, source_manager);
 
-source_manager.update()
+source_manager.update(function(err) {
+  if (err) {
+    console.log('source manager update error');
+  }
+})
 

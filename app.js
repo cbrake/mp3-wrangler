@@ -4,6 +4,7 @@ var Datastore = require('nedb')
 var webui = require('./webui')
 var config = require('./config.json')
 var SourceS3 = require('./source-s3.js')
+var SourceFs = require('./source-fs.js')
 var SourceManager = require('./sourcemanager.js')
 
 // tracks db, contains:
@@ -23,7 +24,8 @@ var db_tracks = new Datastore({filename: './tracks.db', autoload: true});
 //   tracks - (Array<String>) S3 key
 var db_albums = new Datastore({filename: './albums.db', autoload: true});
 
-var source = new SourceS3(config.s3Config);
+// var source = new SourceS3(config.s3Config);
+var source = new SourceFs(config.fsConfig);
 var source_manager = new SourceManager(db_albums, db_tracks, source);
 var ui = new webui(db_albums, db_tracks, config.port, source_manager);
 

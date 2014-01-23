@@ -1,7 +1,12 @@
 {
-  "mp3Source": {
-    "type": "file",
-    "location": "~/Music"
+  "mp3Source": "file",
+  "fsConfig": {
+    "root": "~/Music"
+  },
+  "s3Config": {
+    "accessKeyId": "xxxx", 
+    "secretAccessKey": "yyyy", 
+    "bucket": "mybucket"
   },
   "port": "8025"
 }

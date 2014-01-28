@@ -16,34 +16,35 @@ var SourceManager = module.exports = function(dbAlbums, dbTracks, source) {
   this.source = source;
 }
 
-// this function refreshes the albumn db from the tracks db
-// TODO implement callback
-function create_albums(callback) {
-  console.log("Creating albums ...");
-  dbTracks.find({}, function(err, docs) {
-    docs.forEach(function(doc) {
-      ['artist', 'genre'].forEach(function(field) {
-        if (doc.id3[field].length == 0) {
-          doc.id3[field].push('None');
-        }
-      })
-
-      var album_key = doc.id3.genre + '/' + doc.id3.artist + '/' + doc.id3.album;
-      dbAlbums.update({key:album_key}, {$addToSet: {tracks: doc.key}}, {upsert: true}, function(err, n, upsert) {
-        if (err) {
-          return console.log('Error updating dbAlbums: ' + err);
-        } else {
-        }
-      })
-    })
-  })
-}
 
 SourceManager.prototype.update = function(callback) {
 
   var dbAlbums = this.dbAlbums;
   var dbTracks = this.dbTracks;
   var source = this.source;
+
+  // this function refreshes the albumn db from the tracks db
+  // TODO implement callback
+  function create_albums() {
+    console.log("Creating albums ...");
+    dbTracks.find({}, function(err, docs) {
+      docs.forEach(function(doc) {
+        ['artist', 'genre'].forEach(function(field) {
+          if (doc.id3[field].length == 0) {
+            doc.id3[field].push('None');
+          }
+        })
+
+        var album_key = doc.id3.genre + '/' + doc.id3.artist + '/' + doc.id3.album;
+        dbAlbums.update({key:album_key}, {$addToSet: {tracks: doc.key}}, {upsert: true}, function(err, n, upsert) {
+          if (err) {
+            return console.log('Error updating dbAlbums: ' + err);
+          } else {
+          }
+        })
+      })
+    })
+  }
 
   // queue requests for ID3 data so we don't get 1000's of open requests
   // at one time

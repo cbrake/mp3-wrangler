@@ -32,6 +32,10 @@ var WebUi = module.exports = function(db_albums, db_tracks, port, source) {
       stream.on('end', function() {
         console.log('stream end: ' + key);
       });
+      stream.on('error', function() {
+        console.log('Error streaming ' + key);
+        res.send('stream error');
+      });
       stream.pipe(res);
     } else {
       res.send('key error')

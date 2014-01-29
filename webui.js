@@ -34,11 +34,11 @@ var WebUi = module.exports = function(db_albums, db_tracks, port, source) {
       });
       stream.on('error', function() {
         console.log('Error streaming ' + key);
-        res.send('stream error');
+        res.send(500, 'stream error');
       });
       stream.pipe(res);
     } else {
-      res.send('key error')
+      res.send(500, 'key error')
     }
   })
 
@@ -67,7 +67,12 @@ var WebUi = module.exports = function(db_albums, db_tracks, port, source) {
     }
 
     var download_stream = source.createDownloadStream(req.session.albums);
-
+    
+    // FIXME: the following does not work
+    download_stream.on('error', function() {
+      res.send(500, 'Stream error');
+    });
+    
     res.setHeader('Content-disposition', 'attachment; filename=albums.zip');
     res.setHeader('Content-type', 'application/zip');
     download_stream.pipe(res);

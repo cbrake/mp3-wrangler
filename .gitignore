@@ -1,3 +1,4 @@
 aws-config.json
 config.json
 *.db
+node_modules

@@ -23,6 +23,7 @@ Install
 1. On a nodejs capable server:
    * git clone *https://github.com/cbrake/mp3-wrangler.git*
    * cd *mp3-wrangler*
+   * npm install
    * cp *aws-config.json.sample* *aws-config.json*
    * edit *aws-config.json* with your AWS and port settings
    * node app.js

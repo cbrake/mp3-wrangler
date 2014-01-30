@@ -1,0 +1,31 @@
+{
+  "name": "mp3-wrangler",
+  "version": "0.0.1",
+  "description": "MP3 archive browser and downloader",
+  "main": "app.js",
+  "directories": {
+    "example": "example"
+  },
+  "dependencies": {
+    "archiver": "~0.5.2",
+    "async": "~0.2.10",
+    "aws-sdk": "~2.0.0-rc9",
+    "express": "~3.4.8",
+    "musicmetadata": "~0.3.2",
+    "nedb": "~0.10.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/cbrake/mp3-wrangler.git"
+  },
+  "author": "Cliff Brake <cbrake@bec-systems.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cbrake/mp3-wrangler/issues"
+  },
+  "homepage": "https://github.com/cbrake/mp3-wrangler"
+}

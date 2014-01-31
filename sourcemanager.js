@@ -121,7 +121,7 @@ SourceManager.prototype.createReadFileStream = function(name) {
 SourceManager.prototype.createDownloadStream = function(albums) {
 
   // cycle through albumns and tracks and add to zip file
-  var archive = archiver('zip');
+  var archive = archiver('zip', {level:0});
 
   var source = this.source;
   var dbAlbums = this.dbAlbums;

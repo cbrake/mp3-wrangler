@@ -62,7 +62,7 @@ SourceManager.prototype.update = function(callback) {
     })
     parser.on('done', function(err) {
       if (err) {
-        return console.log('parser error: ' + err);
+        console.log('parser error: ' + key + ' :' + err);
       }
       // TODO: stop stream to save bandwidth
       // could possibly stop stream after we have metadata as well
@@ -106,7 +106,7 @@ SourceManager.prototype.update = function(callback) {
 
   source.getFiles(null, function(err, data) {
     if (err) {
-      console.log("Error source.getFiles");
+      console.log("Error source.getFiles: " + err);
     } else {
       process_data(data);
     }

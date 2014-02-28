@@ -1,24 +1,22 @@
 var express = require('express')
   , flash = require('connect-flash')
   , passport = require('passport')
-  , LocalStrategy = require('passport-local').Strategy;
+  , LocalStrategy = require('passport-local').Strategy
+  , config = require('./config.json');
 
-var users = [
-  { id: 1, username: 'cbrake', password: 'cliffbrake', email: 'cbrake@bec-systems.com' }
-];
 
 function findById(id, fn) {
   var idx = id - 1;
-  if (users[idx]) {
-    fn(null, users[idx]);
+  if (config.users[idx]) {
+    fn(null, config.users[idx]);
   } else {
     fn(new Error('User ' + id + ' does not exist'));
   }
 }
 
 function findByUsername(username, fn) {
-  for (var i = 0, len = users.length; i < len; i++) {
-    var user = users[i];
+  for (var i = 0, len = config.users.length; i < len; i++) {
+    var user = config.users[i];
     if (user.username === username) {
       return fn(null, user);
     }
@@ -65,10 +63,17 @@ passport.use(new LocalStrategy(
   }
 ));
 
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) { return next(); }
+  res.redirect('/login')
+}
+
 
 var WebUi = module.exports = function(db_albums, db_tracks, port, source) {
   var app = express()
 
+  app.set('views', __dirname + '/views');
+  app.set('view engine', 'ejs');
   //app.use(express.logger());
   app.use(express.bodyParser());
   app.use(express.cookieParser());
@@ -82,7 +87,7 @@ var WebUi = module.exports = function(db_albums, db_tracks, port, source) {
   app.configure(function() {
   })
 
-  app.get('/', function(req, res) {
+  app.get('/', ensureAuthenticated, function(req, res) {
     console.log('sending index.html');
     res.sendfile('public/index.html', { user: req.user });
   });
@@ -90,6 +95,12 @@ var WebUi = module.exports = function(db_albums, db_tracks, port, source) {
   app.get('/login', function(req, res) {
     res.render('login', { user: req.user, message: req.flash('error') });
   });
+
+  app.post('/login',
+    passport.authenticate('local', { failureRedirect: '/login', failureFlash: true}),
+    function(req, res) {
+      res.redirect('/');
+    });
 
   app.get('/albums', function(req, res) {
     db_albums.find({}, function(err, docs) {

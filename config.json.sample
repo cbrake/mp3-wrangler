@@ -8,5 +8,9 @@
     "secretAccessKey": "yyyy", 
     "bucket": "mybucket"
   },
-  "port": "8025"
+  "port": "8025",
+  "users": [
+    { "id": 1, "username": "user1", "password": "user1pass", "email": "user@mail.com" }
+  ]
 }
+

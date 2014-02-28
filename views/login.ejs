@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Album Browser</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="lib/bootstrap-3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <script src="lib/js/react.js"></script>
+    <script src="lib/js/JSXTransformer.js"></script>
+  </head>
+  <body>
+    <% if (message) { %>
+    <p><%= message %></p>
+    <% } %>
+    <form class="form-horizontal" role="form" action="/login" method="post">
+      <div class="form-group">
+        <label for="userName" class="col-sm-2 control-label">Username:</label>
+        <div class="col-sm-4">
+          <input id="userName" type="text" name="username" class="form-control"/><br/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="passWord" class="col-sm-2 control-label">Password:</label>
+        <div class="col-sm-4">
+          <input id="passWord" type="password" name="password" class="form-control"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <input class="btn btn-primary" type="submit" value="Submit"/>
+        </div>
+      </div>
+    </form>
+  </body>
+</html>
+

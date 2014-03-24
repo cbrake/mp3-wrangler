@@ -62,10 +62,10 @@ Roadmap
 * ~~create index of S3 key and ID3 tag data~~
 * ~~display based on tag data instead of file structure~~
 * ~~select albumns/tracks/artists and download in zip format~~
+* ~~add users and logins~~
 * periodically rescan and look for new keys, if new keys found, extract ID3 tag data
 * search features to search for tracks based on ID3 tags
 * page display of album data
-* add users and logins
 * admin page
 * integrate mp3 player such that albums can be played in web browser
 

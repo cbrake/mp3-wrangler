@@ -1,8 +1,7 @@
 // File system backend for mp3 files
 // source-xx modules must export the following functions:
-//   - (void) getFiles(params = {}, callback) -- returns up to 1000 files.
-//     - params -- (Object)
-//       - marker -- (String) specifies the key to start with when listing objects
+//   - (void) getFiles(params = {}, callback) -- returns all files (can be a large dataset)
+//     - params -- (Object) -- currently null
 //     - callback: function(err, data) { ... }
 //       - err -- (Error) -- the error object returned, set to null if successful
 //       - data -- (Object)

@@ -46,63 +46,63 @@ SourceManager.prototype.update = function(callback) {
     })
   }
 
-  // queue requests for ID3 data so we don't get 1000's of open requests
-  // at one time
-  var id3_queue = async.queue(function(key, callback) {
-    // fetch file so we can parse id3 tags
-    var stream = source.createReadFileStream(key);
-    var parser = new mm(stream);
-    parser.on('metadata', function(result) {
-      var doc = {key: key, id3: result};
-      dbTracks.insert(doc, function(err, newDoc) {
-        if (err) {
-          return console.log("Error inserting track into db: " + err);
-        }
-      })
-    })
-    parser.on('done', function(err) {
-      if (err) {
-        console.log('parser error: ' + key + ' :' + err);
-      }
-      // TODO: stop stream to save bandwidth
-      // could possibly stop stream after we have metadata as well
-      callback(null);
-    });
-  }, 1);
-
   function process_data(data) {
-    var fetch_i3d_data = false;
+    var fetch_id3_data = false;
 
-    console.log("Processing data ...");
+    console.log("Processing data, " + data.contents.length + " entries ...");
     if (data.IsTruncated === true) {
       console.log('WARNING: data is truncated');
     }
 
-    data.contents.forEach(function(item) {
+    function processDataIterator(item, callback) {
       if (/.*\.mp3$/.exec(item)) {
+        // FIXME, this is blowing the stack
         dbTracks.find({key: item}, function(err, docs) {
           if (err) {
-            return console.log('track find error: ' + err);
-          }
-          if (docs.length == 0) {
-            console.log('Getting ID3 tags for ' + item);
-            id3_queue.push(item, function(err) {
-              fetch_i3d_data = true;
-              console.log('finished processing ' + item);
-            })
+            console.log("dbTracks.find error");
+            callback(err);
           } else {
+            if (docs.length == 0) {
+              console.log('Getting ID3 tags for ' + item);
+              fetch_id3_data = true;
+              var stream = source.createReadFileStream(item);
+              var parser = new mm(stream);
+              parser.on('metadata', function(result) {
+                var doc = {key: item, id3: result};
+                dbTracks.insert(doc, function(err, newDoc) {
+                  if (err) {
+                    console.log("Error inserting track into db: " + err);
+                  }
+                })
+              })
+              parser.on('done', function(err) {
+                if (err) {
+                  console.log('parser error: ' + item + ' :' + err);
+                }
+                setImmediate(callback);
+              });
+            } else {
+              setImmediate(callback);
+            }
           }
         })
+      } else {
+        setImmediate(callback);
+      }
+    }
+
+    async.eachSeries(data.contents, processDataIterator, function(err) {
+      console.log("Finished processing items");
+      if (err) {
+        callback (err);
+      } else if (!fetch_id3_data) {
+        // we are finished
+        callback(null);
+      } else {
+        create_albums();
       }
     })
-
-    if (!fetch_i3d_data) {
-      // we are finished
-      callback(null);
-    }
   }
-
-  id3_queue.drain = create_albums;
 
   source.getFiles(null, function(err, data) {
     if (err) {

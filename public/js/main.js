@@ -23,14 +23,14 @@ var DownloadAlbums = React.createClass({
     });
     var heading = selected_albums.length > 0 ? <h3>Selected for download</h3> : null;
     var download = selected_albums.length > 0 ? 
-      <a href="/download" class="btn btn-primary form-control">Download Selected</a> : null;
+      <a href="/download" className="btn btn-primary form-control">Download Selected</a> : null;
     return (
       <div>
         {heading}
         <ul>
           {selected_albums}
         </ul>
-        <div class="col-sm-2">
+        <div className="col-sm-2">
           {download}
         </div>
       </div>
@@ -143,7 +143,7 @@ var AlbumLine = React.createClass({
   },
   render: function() {
     var tracks = this.state.displayTracks ? <Tracks tracks={this.props.album.tracks} /> : null;
-    var add = this.props.selected ? 'selected' : <button type="button" class="btn btn-default" onClick = {this.handleAdd}>add</button>;
+    var add = this.props.selected ? 'selected' : <button type="button" className="btn btn-default" onClick = {this.handleAdd}>add</button>;
     return (
       <tr key={this.props.key}>
         <td>{this.props.album.genre}</td>
@@ -218,7 +218,7 @@ var AlbumList = React.createClass({
     return (
       <div>
       <DownloadAlbums removeAlbumDownload={this.removeAlbumDownload} albumsToDownload={this.state.albumsToDownload} />
-      <table class="table table-striped">
+      <table className="table table-striped">
         <thead>
           <tr>
             <th>Genre</th>
@@ -236,8 +236,55 @@ var AlbumList = React.createClass({
   }
 });
 
+var ToolBar = React.createClass({
+  render: function() {
+    return (
+      <div className="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div className="container">
+      <div className="navbar-header">
+      <button type="button" className="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+      <span className="sr-only">Toggle navigation</span>
+      <span className="icon-bar"></span>
+      <span className="icon-bar"></span>
+      <span className="icon-bar"></span>
+      </button>
+      <a className="navbar-brand" href="#">MP3 Browser</a>
+      </div>
+      <div className="navbar-collapse collapse">
+      <form className="navbar-form navbar-right" role="form">
+      <div className="form-group">
+      <input type="text" placeholder="artist" className="form-control"/>
+      </div>
+      <div className="form-group">
+      <input type="text" placeholder="album" className="form-control"/>
+      </div>
+      <div className="form-group">
+      <input type="text" placeholder="tags" className="form-control"/>
+      </div>
+      <button type="submit" className="btn btn-success">Search</button>
+      </form>
+      </div>
+      </div>
+      </div>
+    );
+  }
+});
+
+
+var App = React.createClass({
+  render: function() {
+    return (
+      <div>
+        <ToolBar />
+        <AlbumList />
+      </div>
+    );
+  }
+});
+
+
 React.renderComponent(
-  <AlbumList />,
+  <App />,
   document.getElementById('album-list')
 );
 

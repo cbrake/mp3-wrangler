@@ -237,6 +237,22 @@ var AlbumList = React.createClass({
 });
 
 var ToolBar = React.createClass({
+  getInitialState: function() {
+    return {artist: '', album: '', tags: ''};
+  },
+  handleSearch: function(event) {
+    console.log("handleSearch");
+    return false;
+  },
+  handleArtist: function(event) {
+    this.setState({artist: event.target.value});
+  },
+  handleAlbum: function(event) {
+    this.setState({album: event.target.value});
+  },
+  handleTags: function(event) {
+    this.setState({tags: event.target.value});
+  },
   render: function() {
     return (
       <div className="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -251,17 +267,17 @@ var ToolBar = React.createClass({
       <a className="navbar-brand" href="#">MP3 Browser</a>
       </div>
       <div className="navbar-collapse collapse">
-      <form className="navbar-form navbar-right" role="form">
-      <div className="form-group">
-      <input type="text" placeholder="artist" className="form-control"/>
-      </div>
-      <div className="form-group">
-      <input type="text" placeholder="album" className="form-control"/>
-      </div>
-      <div className="form-group">
-      <input type="text" placeholder="tags" className="form-control"/>
-      </div>
-      <button type="submit" className="btn btn-success">Search</button>
+      <form className="navbar-form navbar-right" role="form" onSubmit={this.handleSearch}>
+        <div className="form-group">
+          <input type="text" placeholder="artist" className="form-control" value={this.state.artist} onChange={this.handleArtist} />
+        </div>
+        <div className="form-group">
+          <input type="text" placeholder="album" className="form-control" value={this.state.album} onChange={this.handleAlbum} />
+        </div>
+        <div className="form-group">
+          <input type="text" placeholder="tags" className="form-control" value={this.state.tags} onChange={this.handleTags} />
+        </div>
+        <button className="btn btn-success">Search</button>
       </form>
       </div>
       </div>
@@ -269,7 +285,6 @@ var ToolBar = React.createClass({
     );
   }
 });
-
 
 var App = React.createClass({
   render: function() {
@@ -281,7 +296,6 @@ var App = React.createClass({
     );
   }
 });
-
 
 React.renderComponent(
   <App />,

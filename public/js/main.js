@@ -162,9 +162,6 @@ var AlbumLine = React.createClass({
 
 var AlbumList = React.createClass({
   getInitialState: function() {
-    $.get('/albums', function(data) {
-      this.setState({albums: data});
-    }.bind(this));
 
     $.get('/download-list', function(data) {
       this.setState({albumsToDownload: data});
@@ -198,7 +195,7 @@ var AlbumList = React.createClass({
     var that = this;
     var album_lines = [];
 
-    this.state.albums.forEach(function(a) {
+    this.props.albums.forEach(function(a) {
       var r;
       if (r = /(.*)\/(.*)\/(.*)/.exec(a.key)) {
         var a_ = {
@@ -238,10 +235,21 @@ var AlbumList = React.createClass({
 
 var ToolBar = React.createClass({
   getInitialState: function() {
+    $.get('/search', function(data) {
+      this.setState({artist: data.artist});
+      this.setState({album: data.album});
+      this.setState({tags: data.tags});
+    }.bind(this));
+
     return {artist: '', album: '', tags: ''};
   },
   handleSearch: function(event) {
     console.log("handleSearch");
+    var search = this.state;
+    $.post('/search', {search: this.state}, function(data) {
+      console.log('post search returns ' + data);
+      this.props.callback();
+    }.bind(this));
     return false;
   },
   handleArtist: function(event) {
@@ -252,6 +260,15 @@ var ToolBar = React.createClass({
   },
   handleTags: function(event) {
     this.setState({tags: event.target.value});
+  },
+  handleClear: function(event) {
+    var s = {artist: '', album: '', tags: ''};
+    this.setState(s); 
+    $.post('/search', {search: s}, function(data) {
+      console.log('post search returns ' + data);
+      this.props.callback();
+    }.bind(this));
+    return false;
   },
   render: function() {
     return (
@@ -269,15 +286,10 @@ var ToolBar = React.createClass({
       <div className="navbar-collapse collapse">
       <form className="navbar-form navbar-right" role="form" onSubmit={this.handleSearch}>
         <div className="form-group">
-          <input type="text" placeholder="artist" className="form-control" value={this.state.artist} onChange={this.handleArtist} />
+          <input type="text" placeholder="search" className="form-control" value={this.state.artist} onChange={this.handleArtist} />
+          <button className="btn btn-success">Search</button>
+          <button className="btn btn-warning" onClick={this.handleClear}>Clear</button>
         </div>
-        <div className="form-group">
-          <input type="text" placeholder="album" className="form-control" value={this.state.album} onChange={this.handleAlbum} />
-        </div>
-        <div className="form-group">
-          <input type="text" placeholder="tags" className="form-control" value={this.state.tags} onChange={this.handleTags} />
-        </div>
-        <button className="btn btn-success">Search</button>
       </form>
       </div>
       </div>
@@ -287,11 +299,21 @@ var ToolBar = React.createClass({
 });
 
 var App = React.createClass({
+  getInitialState: function() {
+    this.searchCallback();
+    return {albums: []};
+  },
+  searchCallback: function() {
+    $.get('/albums', function(data) {
+      this.setState({albums: data});
+    }.bind(this));
+    console.log("searchCallback");
+  },
   render: function() {
     return (
       <div>
-        <ToolBar />
-        <AlbumList />
+        <ToolBar callback={this.searchCallback} />
+        <AlbumList albums={this.state.albums} />
       </div>
     );
   }

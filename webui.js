@@ -2,7 +2,8 @@ var express = require('express')
   , flash = require('connect-flash')
   , passport = require('passport')
   , LocalStrategy = require('passport-local').Strategy
-  , config = require('./config.json');
+  , config = require('./config.json')
+  , util = require('util');
 
 
 function findById(id, fn) {
@@ -77,7 +78,7 @@ var WebUi = module.exports = function(db_albums, db_tracks, port, source) {
   //app.use(express.logger());
   app.use(express.bodyParser());
   app.use(express.cookieParser());
-  app.use(express.session({secret: 'mp3-wrangler-1234'}));
+  app.use(express.session({secret: 'mp3-wrangler-1234', search: {artist: '', album: '', tags: ''}}));
   app.use(flash());
   app.use(passport.initialize());
   app.use(passport.session());
@@ -88,6 +89,10 @@ var WebUi = module.exports = function(db_albums, db_tracks, port, source) {
   })
 
   app.get('/', ensureAuthenticated, function(req, res) {
+    if (!req.session.search) {
+      console.log("Search is not set, this should not happen!");
+      req.session.search = {artist: '', album: '', tags: ''};
+    }
     console.log('sending index.html');
     res.sendfile('public/index.html', { user: req.user });
   });
@@ -103,7 +108,12 @@ var WebUi = module.exports = function(db_albums, db_tracks, port, source) {
     });
 
   app.get('/albums', function(req, res) {
-    db_albums.find({}, function(err, docs) {
+    console.log('/albums, search = ' + util.inspect(req.session.search));
+    var find = {};
+    if (req.session.search.artist !== '') {
+      find["key"] = { $regex: new RegExp(req.session.search.artist, 'i')};
+    }
+    db_albums.find(find, function(err, docs) {
       if (err) {
         res.send(err);
         return console.log('/albums error: ' + err);
@@ -142,6 +152,19 @@ var WebUi = module.exports = function(db_albums, db_tracks, port, source) {
   app.post('/download-list', function(req, res) {
     req.session.albums = req.body.albums;
     res.send('ok');
+  })
+
+  app.post('/search', function(req, res) {
+    console.log("Search: " + util.inspect(req.body.search));
+    req.session.search = req.body.search;
+    res.send('ok');
+  })
+
+  app.get('/search', function(req, res) {
+    if (!req.session.search) {
+      req.session.search = { artist: '', album: '', tags: ''};
+    }
+    res.send(req.session.search);
   })
 
   app.get('/download-list', function(req, res) {

@@ -298,22 +298,62 @@ var ToolBar = React.createClass({
   }
 });
 
+var Pager = React.createClass({
+  getInitialState: function() {
+    return {};
+  },
+  handleClick: function(event) {
+    this.props.callback(parseInt(event.target.text));
+    return false;
+  },
+  render: function() {
+    var that = this;
+    var pages = Array(this.props.pages);
+    for (var i = 0; i < pages.length; i++) {
+      pages[i] = i+1;
+    }
+    
+    console.log("pages = " + pages.toString());
+
+    var pages_ = pages.map(function(p) {
+      // FIXME, this is not working
+      console.log("that.props.page = " + that.props.page + " p = " + p);
+      if (p == that.props.page) {
+        return p;
+      } else {
+        return <a href="" key={p} onClick={that.handleClick}>{p}</a>;
+      }
+    });
+
+    console.log("pages_ = " + pages_.toString());
+
+    return (
+      <div className="container">
+        {pages_}
+      </div>
+    );
+  }
+});
+
 var App = React.createClass({
   getInitialState: function() {
-    this.searchCallback();
-    return {albums: []};
+    setTimeout(this.searchCallback, 0);
+    return {albums: [], page: 1, pages: 0};
   },
   searchCallback: function() {
-    $.get('/albums', function(data) {
-      this.setState({albums: data});
+    $.get('/albums/' + this.state.page, function(data) {
+      this.setState({albums: data.albums, pages: data.pages, page: data.page });
     }.bind(this));
-    console.log("searchCallback");
+  },
+  pagerCallback: function(page) {
+    console.log("pagerCallback: " + page);
   },
   render: function() {
     return (
-      <div>
+      <div className>
         <ToolBar callback={this.searchCallback} />
         <AlbumList albums={this.state.albums} />
+        <Pager pages={this.state.pages} page={this.state.page} callback={this.pagerCallback} />
       </div>
     );
   }

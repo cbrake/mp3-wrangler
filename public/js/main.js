@@ -298,22 +298,85 @@ var ToolBar = React.createClass({
   }
 });
 
+var Pager = React.createClass({
+  getInitialState: function() {
+    return {};
+  },
+  handleClick: function(event) {
+    this.props.callback(parseInt(event.target.text));
+    return false;
+  },
+  handlePrevious: function(event) {
+    this.props.callback(this.props.currentPage - 1);
+    return false;
+  },
+  handleNext: function(event) {
+    this.props.callback(this.props.currentPage + 1);
+    return false;
+  },
+  render: function() {
+    var that = this;
+    var pages = Array(this.props.pages);
+    for (var i = 0; i < pages.length; i++) {
+      pages[i] = i+1;
+    }
+
+    if (this.props.currentPage === 1) {
+      var previous = <span>{'previous \u00A0'}</span>;
+    } else {
+      var previous = <a href="" onClick={this.handlePrevious}>{'previous \u00A0'}</a>;
+    }
+
+    if (this.props.currentPage === this.props.pages) {
+      var next = <span>{'next \u00A0'}</span>;
+    } else {
+      var next = <a href="" onClick={this.handleNext}>{'next \u00A0'}</a>;
+    }
+    
+    var pages_ = pages.map(function(p) {
+      if (p === that.props.currentPage) {
+        return <span>{p + '\u00A0'}</span>;
+      } else {
+        return <a href="" key={p} onClick={that.handleClick}>{p + '\u00A0'}</a>;
+      }
+    });
+
+    return (
+      <div className="container">
+        {previous}
+        {pages_}
+        {next}
+      </div>
+    );
+  }
+});
+
 var App = React.createClass({
   getInitialState: function() {
-    this.searchCallback();
-    return {albums: []};
+    setTimeout(this.searchCallback, 0);
+    return {albums: [], page: 1, pages: 0};
   },
   searchCallback: function() {
-    $.get('/albums', function(data) {
-      this.setState({albums: data});
+    var that = this;
+    this.setState({page: 1});
+    setTimeout(function() {
+      $.get('/albums/' + that.state.page, function(data) {
+        that.setState({albums: data.albums, pages: data.pages, page: data.page });
+      }.bind(that));
+    }, 0);
+  },
+  pagerCallback: function(page) {
+    console.log("pagerCallback: " + page);
+    $.get('/albums/' + page, function(data) {
+      this.setState({albums: data.albums, pages: data.pages, page: data.page });
     }.bind(this));
-    console.log("searchCallback");
   },
   render: function() {
     return (
-      <div>
+      <div className>
         <ToolBar callback={this.searchCallback} />
         <AlbumList albums={this.state.albums} />
+        <Pager pages={this.state.pages} currentPage={this.state.page} callback={this.pagerCallback} />
       </div>
     );
   }

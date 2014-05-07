@@ -116,7 +116,7 @@ var WebUi = module.exports = function(db_albums, db_tracks, port, source) {
       find["key"] = { $regex: new RegExp(req.session.search.artist, 'i')};
     }
     db_albums.count(find, function(err, count) {
-      db_albums.find(find).sort({key: 1}).skip(page - 1).limit(itemsPerPage).exec(function(err, docs) {
+      db_albums.find(find).sort({key: 1}).skip((page - 1)*itemsPerPage).limit(itemsPerPage).exec(function(err, docs) {
         pages = Math.ceil(count/itemsPerPage);
         if (err) {
           res.send(err);

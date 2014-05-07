@@ -108,21 +108,20 @@ var WebUi = module.exports = function(db_albums, db_tracks, port, source) {
     });
 
   app.get('/albums/:page', function(req, res) {
-    console.log('/albums/' + req.page + ', search = ' + util.inspect(req.session.search));
+    console.log('/albums/' + req.params.page + ', search = ' + util.inspect(req.session.search));
     var itemsPerPage = 10;
     var find = {};
     if (req.session.search.artist !== '') {
       find["key"] = { $regex: new RegExp(req.session.search.artist, 'i')};
     }
     db_albums.count(find, function(err, count) {
-      db_albums.find(find).sort({key: 1}).skip(req.page - 1).limit(itemsPerPage).exec(function(err, docs) {
+      db_albums.find(find).sort({key: 1}).skip(req.params.page - 1).limit(itemsPerPage).exec(function(err, docs) {
         pages = Math.ceil(count/itemsPerPage);
         if (err) {
           res.send(err);
           return console.log('/albums error: ' + err);
         }
         res.send({albums: docs, pages: pages, page: req.page});
-        console.log(util.inspect(docs));
       });
     });
   })

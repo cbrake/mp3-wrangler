@@ -347,6 +347,9 @@ var App = React.createClass({
   },
   pagerCallback: function(page) {
     console.log("pagerCallback: " + page);
+    $.get('/albums/' + page, function(data) {
+      this.setState({albums: data.albums, pages: data.pages, page: data.page });
+    }.bind(this));
   },
   render: function() {
     return (

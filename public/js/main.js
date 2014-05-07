@@ -313,19 +313,13 @@ var Pager = React.createClass({
       pages[i] = i+1;
     }
     
-    console.log("pages = " + pages.toString());
-
     var pages_ = pages.map(function(p) {
-      // FIXME, this is not working
-      console.log("that.props.page = " + that.props.page + " p = " + p);
-      if (p == that.props.page) {
+      if (p === that.props.currentPage) {
         return p;
       } else {
         return <a href="" key={p} onClick={that.handleClick}>{p}</a>;
       }
     });
-
-    console.log("pages_ = " + pages_.toString());
 
     return (
       <div className="container">
@@ -341,9 +335,13 @@ var App = React.createClass({
     return {albums: [], page: 1, pages: 0};
   },
   searchCallback: function() {
-    $.get('/albums/' + this.state.page, function(data) {
-      this.setState({albums: data.albums, pages: data.pages, page: data.page });
-    }.bind(this));
+    var that = this;
+    this.setState({page: 1});
+    setTimeout(function() {
+      $.get('/albums/' + that.state.page, function(data) {
+        that.setState({albums: data.albums, pages: data.pages, page: data.page });
+      }.bind(that));
+    }, 0);
   },
   pagerCallback: function(page) {
     console.log("pagerCallback: " + page);
@@ -356,7 +354,7 @@ var App = React.createClass({
       <div className>
         <ToolBar callback={this.searchCallback} />
         <AlbumList albums={this.state.albums} />
-        <Pager pages={this.state.pages} page={this.state.page} callback={this.pagerCallback} />
+        <Pager pages={this.state.pages} currentPage={this.state.page} callback={this.pagerCallback} />
       </div>
     );
   }

@@ -316,30 +316,37 @@ var Pager = React.createClass({
   },
   render: function() {
     var that = this;
-    var pages = Array(this.props.pages);
-    for (var i = 0; i < pages.length; i++) {
-      pages[i] = i+1;
-    }
 
-    if (this.props.currentPage === 1) {
-      var previous = <span>{'previous \u00A0'}</span>;
+    if (this.props.pages <= 1) {
+      var previous = '';
+      var next = '';
+      var pages_ = '';
     } else {
-      var previous = <a href="" onClick={this.handlePrevious}>{'previous \u00A0'}</a>;
-    }
-
-    if (this.props.currentPage === this.props.pages) {
-      var next = <span>{'next \u00A0'}</span>;
-    } else {
-      var next = <a href="" onClick={this.handleNext}>{'next \u00A0'}</a>;
-    }
-    
-    var pages_ = pages.map(function(p) {
-      if (p === that.props.currentPage) {
-        return <span>{p + '\u00A0'}</span>;
+      if (this.props.currentPage === 1) {
+        var previous = <span>{'previous \u00A0'}</span>;
       } else {
-        return <a href="" key={p} onClick={that.handleClick}>{p + '\u00A0'}</a>;
+        var previous = <a href="" onClick={this.handlePrevious}>{'previous \u00A0'}</a>;
       }
-    });
+
+      if (this.props.currentPage === this.props.pages) {
+        var next = <span>{'next \u00A0'}</span>;
+      } else {
+        var next = <a href="" onClick={this.handleNext}>{'next \u00A0'}</a>;
+      }
+
+      var pages = Array(this.props.pages);
+      for (var i = 0; i < pages.length; i++) {
+        pages[i] = i+1;
+      }
+    
+      var pages_ = pages.map(function(p) {
+        if (p === that.props.currentPage) {
+          return <span>{p + '\u00A0'}</span>;
+        } else {
+          return <a href="" key={p} onClick={that.handleClick}>{p + '\u00A0'}</a>;
+        }
+      });
+    }
 
     return (
       <div className="container">

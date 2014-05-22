@@ -307,11 +307,15 @@ var Pager = React.createClass({
     return false;
   },
   handlePrevious: function(event) {
-    this.props.callback(this.props.currentPage - 1);
+    if (this.props.currentPage !== 1) {
+      this.props.callback(this.props.currentPage - 1);
+    }
     return false;
   },
   handleNext: function(event) {
-    this.props.callback(this.props.currentPage + 1);
+    if (this.props.currentPage !== this.props.pages) {
+      this.props.callback(this.props.currentPage + 1);
+    }
     return false;
   },
   render: function() {
@@ -323,16 +327,18 @@ var Pager = React.createClass({
       var pages_ = '';
     } else {
       if (this.props.currentPage === 1) {
-        var previous = <span>{'previous \u00A0'}</span>;
+        var p_c = "disabled";
       } else {
-        var previous = <a href="" onClick={this.handlePrevious}>{'previous \u00A0'}</a>;
+        var p_c = "";
       }
+      var previous = <li className={p_c}><a href="#" onClick={this.handlePrevious}>&laquo;</a></li>
 
       if (this.props.currentPage === this.props.pages) {
-        var next = <span>{'next \u00A0'}</span>;
+        var n_c = "disabled";
       } else {
-        var next = <a href="" onClick={this.handleNext}>{'next \u00A0'}</a>;
+        var n_c = "";
       }
+      var next = <li className={n_c}><a href="#" onClick={this.handleNext}>&raquo;</a></li>
 
       var pages = Array(this.props.pages);
       for (var i = 0; i < pages.length; i++) {
@@ -340,23 +346,45 @@ var Pager = React.createClass({
       }
     
       var pages_ = pages.map(function(p) {
-        if (p === that.props.currentPage) {
-          return <span>{p + '\u00A0'}</span>;
+        // for searchs with a large number of pages, only display
+        // a limitted number of page numbers
+        var numPagesDisplay = 2/2;
+        var min = that.props.currentPage - numPagesDisplay;
+        var max = that.props.currentPage + numPagesDisplay;
+
+        if (min < 1) {
+          min = 1;
+          max = max + 1 - min;
+        }
+
+        if (max > that.props.pages) {
+          max = that.props.pages;
+          min = min - (max - that.props.pages);
+        }
+
+        if (p >= min && p <= max) {
+          if (p === that.props.currentPage) {
+            var c = "active";
+          } else {
+            var c = "";
+          }
+          return <li className={c} key={p}><a href="#" onClick={that.handleClick}>{p}</a></li>;
         } else {
-          return <a href="" key={p} onClick={that.handleClick}>{p + '\u00A0'}</a>;
+          return null;
         }
       });
     }
 
     return (
-      <div className="container">
+      <ul className="pagination">
         {previous}
         {pages_}
         {next}
-      </div>
+      </ul>
     );
   }
 });
+
 
 var App = React.createClass({
   getInitialState: function() {

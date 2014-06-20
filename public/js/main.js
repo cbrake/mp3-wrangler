@@ -348,19 +348,27 @@ var Pager = React.createClass({
       var pages_ = pages.map(function(p) {
         // for searchs with a large number of pages, only display
         // a limitted number of page numbers
-        var numPagesDisplay = 2/2;
+        var numPagesDisplay = 4/2;
         var min = that.props.currentPage - numPagesDisplay;
         var max = that.props.currentPage + numPagesDisplay;
 
+        console.log("1: min = " + min + " max = " + max);
+
         if (min < 1) {
-          min = 1;
           max = max + 1 - min;
+          min = 1;
         }
 
+        console.log("2: min = " + min + " max = " + max);
+
         if (max > that.props.pages) {
-          max = that.props.pages;
           min = min - (max - that.props.pages);
+          max = that.props.pages;
         }
+
+        console.log("3: min = " + min + " max = " + max);
+        console.log("=====================");
+
 
         if (p >= min && p <= max) {
           if (p === that.props.currentPage) {
@@ -376,11 +384,14 @@ var Pager = React.createClass({
     }
 
     return (
-      <ul className="pagination">
-        {previous}
-        {pages_}
-        {next}
-      </ul>
+      <div>
+        <div></div>
+        <ul className="pagination">
+          {previous}
+          {pages_}
+          {next}
+        </ul>
+      </div>
     );
   }
 });
@@ -408,7 +419,7 @@ var App = React.createClass({
   },
   render: function() {
     return (
-      <div className>
+      <div>
         <ToolBar callback={this.searchCallback} />
         <AlbumList albums={this.state.albums} />
         <Pager pages={this.state.pages} currentPage={this.state.page} callback={this.pagerCallback} />
@@ -419,7 +430,7 @@ var App = React.createClass({
 
 React.renderComponent(
   <App />,
-  document.getElementById('album-list')
+  document.getElementById('album')
 );
 
 

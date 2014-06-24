@@ -348,27 +348,19 @@ var Pager = React.createClass({
       var pages_ = pages.map(function(p) {
         // for searchs with a large number of pages, only display
         // a limitted number of page numbers
-        var numPagesDisplay = 4/2;
+        var numPagesDisplay = 8/2;
         var min = that.props.currentPage - numPagesDisplay;
         var max = that.props.currentPage + numPagesDisplay;
-
-        console.log("1: min = " + min + " max = " + max);
 
         if (min < 1) {
           max = max + 1 - min;
           min = 1;
         }
 
-        console.log("2: min = " + min + " max = " + max);
-
         if (max > that.props.pages) {
           min = min - (max - that.props.pages);
           max = that.props.pages;
         }
-
-        console.log("3: min = " + min + " max = " + max);
-        console.log("=====================");
-
 
         if (p >= min && p <= max) {
           if (p === that.props.currentPage) {
